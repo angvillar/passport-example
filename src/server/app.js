@@ -47,6 +47,15 @@ app.get('/login', (req, res) => {
   res.render('login.ejs', { message: req.flash('loginMessage') });
 });
 
+app.post('/login', passport.authenticate('local-login', {
+  // redirect to the secure profile section
+  successRedirect: '/profile',
+  // redirect back to the signup page if there is an error
+  failureRedirect: '/login',
+  // allow flash messages
+  failureFlash: true,
+}));
+
 // show the signup form
 app.get('/signup', (req, res) => {
   // render the page and pass in any flash data if it exists
