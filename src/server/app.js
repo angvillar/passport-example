@@ -36,6 +36,17 @@ app.use(passport.session());
 // use connect-flash for flash messages stored in session
 app.use(flash());
 
+// route middleware to make sure a user is logged in
+function isLoggedIn(req, res, next) { // eslint-disable-line consistent-return
+  // if user is authenticated in the session, carry on
+  if (req.isAuthenticated()) {
+    return next();
+  }
+
+  // if they aren't redirect them to the home page
+  res.redirect('/');
+}
+
 // load the index.ejs file
 app.get('/', (req, res) => {
   res.render('index.ejs');
@@ -73,35 +84,18 @@ app.post('/signup', passport.authenticate('local-signup', {
 
 // we will want this protected so you have to be logged in to visit
 // we will use route middleware to verify this (the isLoggedIn function)
-/*
 app.get('/profile', isLoggedIn, (req, res) => {
   res.render('profile.ejs', {
     // get the user out of session and pass to template
     user: req.user,
   });
 });
-*/
 
 // logout
-/*
 app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/');
 });
-*/
-
-// route middleware to make sure a user is logged in
-/*
-function isLoggedIn(req, res, next) {
-  // if user is authenticated in the session, carry on
-  if (req.isAuthenticated()) {
-    return next();
-  }
-
-  // if they aren't redirect them to the home page
-  res.redirect('/');
-}
-*/
 
 app.listen(3000, () => {
   console.log('listening on *:3000'); // eslint-disable-line no-console
