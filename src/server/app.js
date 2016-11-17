@@ -8,8 +8,10 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import path from 'path';
 import mongodbConfig from './mongodb-config';
+import passportConfig from './passport-config';
 
 mongoose.connect(mongodbConfig.url);
+passportConfig(passport);
 
 const app = express();
 // log every request to the console
@@ -50,6 +52,15 @@ app.get('/signup', (req, res) => {
   // render the page and pass in any flash data if it exists
   res.render('signup.ejs', { message: req.flash('signupMessage') });
 });
+
+app.post('/signup', passport.authenticate('local-signup', {
+  // redirect to the secure profile section
+  successRedirect: '/profile',
+  // redirect back to the signup page if there is an error
+  failureRedirect: '/signup',
+  // allow flash messages
+  failureFlash: true,
+}));
 
 // we will want this protected so you have to be logged in to visit
 // we will use route middleware to verify this (the isLoggedIn function)
