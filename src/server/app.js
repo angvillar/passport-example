@@ -100,3 +100,5 @@ app.get('/logout', (req, res) => {
 app.listen(3000, () => {
   console.log('listening on *:3000'); // eslint-disable-line no-console
 });
+
+export default app;

@@ -5,10 +5,13 @@ import gulp from 'gulp';
 import babel from 'gulp-babel';
 import eslint from 'gulp-eslint';
 import nodemon from 'gulp-nodemon';
+import mocha from 'gulp-mocha';
+
 import del from 'del';
 
 const paths = {
   allSrcJs: 'src/**/*.js',
+  allLibTests: 'lib/test/**/*.js',
   gulpFile: 'gulpfile.babel.js',
   libDir: 'lib',
   // serverSrcJs: 'src/server/**/*.js',
@@ -50,5 +53,10 @@ gulp.task('nodemon', ['build'], (cb) => {
     }
   });
 });
+
+gulp.task('test', ['build'], () =>
+  gulp.src(paths.allLibTests)
+    .pipe(mocha()),
+);
 
 gulp.task('default', ['nodemon']);
