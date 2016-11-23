@@ -9,6 +9,7 @@ import SignUpForm from './SignUpForm';
 import SignInForm from './SignInForm';
 import Settings from './Settings';
 import Profile from './Profile';
+import DashboardContainer from './DashboardContainer';
 
 // Needed for onTouchTap
 // http://stackoverflow.com/a/34015469/988941
@@ -48,6 +49,7 @@ const App = () => (
       <Route path="/sign-in" component={SignInForm} />
       <Route path="/settings" component={Settings} />
       <Route path="/settings/profile" component={Profile} onEnter={isLoggedIn} />
+      <Route path="/:username" component={DashboardContainer} />
     </Router>
   </MuiThemeProvider>
 );

@@ -3,10 +3,19 @@ import bcrypt from 'bcrypt-nodejs';
 
 // define the schema for our user model
 const usersSchema = mongoose.Schema({
+
+  username: String,
+
   local: {
     email: String,
     password: String,
   },
+
+  profile: {
+    name: String,
+    bio: String,
+  },
+
 });
 
 // generating a hash

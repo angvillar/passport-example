@@ -82,13 +82,17 @@
 	
 	var _Profile2 = _interopRequireDefault(_Profile);
 	
+	var _DashboardContainer = __webpack_require__(737);
+	
+	var _DashboardContainer2 = _interopRequireDefault(_DashboardContainer);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	// Needed for onTouchTap
 	// http://stackoverflow.com/a/34015469/988941
-	(0, _reactTapEventPlugin2.default)();
-	// import RaisedButton from 'material-ui/RaisedButton';
 	
+	// import RaisedButton from 'material-ui/RaisedButton';
+	(0, _reactTapEventPlugin2.default)();
 	
 	var isLoggedIn = function isLoggedIn(nextState, replace, callback) {
 	  console.log(nextState);
@@ -124,7 +128,8 @@
 	      _react2.default.createElement(_reactRouter.Route, { path: '/sign-up', component: _SignUpForm2.default }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/sign-in', component: _SignInForm2.default }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/settings', component: _Settings2.default }),
-	      _react2.default.createElement(_reactRouter.Route, { path: '/settings/profile', component: _Profile2.default, onEnter: isLoggedIn })
+	      _react2.default.createElement(_reactRouter.Route, { path: '/settings/profile', component: _Profile2.default, onEnter: isLoggedIn }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/:username', component: _DashboardContainer2.default })
 	    )
 	  );
 	};
@@ -42181,6 +42186,7 @@
 	      event.preventDefault();
 	
 	      var details = {
+	        username: this.state.username.value,
 	        email: this.state.email.value,
 	        password: this.state.password.value
 	      };
@@ -65633,8 +65639,10 @@
 	      event.preventDefault();
 	
 	      var data = {
-	        name: this.state.name.value,
-	        bio: this.state.bio.value
+	        profile: {
+	          name: this.state.name.value,
+	          bio: this.state.bio.value
+	        }
 	      };
 	
 	      // const formData = new FormData();
@@ -65699,6 +65707,126 @@
 	}(_react2.default.Component);
 	
 	exports.default = Profile;
+
+/***/ },
+/* 737 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(298);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _Dashboard = __webpack_require__(738);
+	
+	var _Dashboard2 = _interopRequireDefault(_Dashboard);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint-disable react/prop-types */
+	
+	var DashboardContainer = function (_React$Component) {
+	  _inherits(DashboardContainer, _React$Component);
+	
+	  function DashboardContainer(props) {
+	    _classCallCheck(this, DashboardContainer);
+	
+	    var _this = _possibleConstructorReturn(this, (DashboardContainer.__proto__ || Object.getPrototypeOf(DashboardContainer)).call(this, props));
+	
+	    _this.state = { user: {} };
+	    return _this;
+	  }
+	
+	  _createClass(DashboardContainer, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var _this2 = this;
+	
+	      var uri = '/' + this.props.params.username;
+	      console.log('fetching: ', uri);
+	      fetch(uri, {
+	        method: 'get',
+	        credentials: 'same-origin',
+	        headers: {
+	          Accept: 'application/json'
+	        }
+	      }).then(function (res) {
+	        console.log(res);
+	        return res.json();
+	      }).then(function (json) {
+	        console.log(json);
+	        _this2.setState({ user: json.user });
+	      }).catch(console.log);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(_Dashboard2.default, { user: this.state.user });
+	    }
+	  }]);
+	
+	  return DashboardContainer;
+	}(_react2.default.Component);
+	
+	/*
+	DashboardContainer.propTypes = {
+	  params: {
+	    username: React.PropTypes.string,
+	  },
+	};
+	*/
+	
+	exports.default = DashboardContainer;
+
+/***/ },
+/* 738 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(298);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function Dashboard(props) {
+	  return _react2.default.createElement(
+	    'div',
+	    null,
+	    _react2.default.createElement(
+	      'h1',
+	      null,
+	      props.user.username
+	    )
+	  );
+	}
+	
+	/*
+	Dashboard.propTypes = {
+	  user: {
+	    username: React.PropTypes.string,
+	  },
+	};
+	*/
+	
+	/* eslint-disable react/prop-types */
+	exports.default = Dashboard;
 
 /***/ }
 /******/ ]);

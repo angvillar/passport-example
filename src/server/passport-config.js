@@ -25,6 +25,7 @@ const passportConfig = (passport) => {
     passReqToCallback: true,
   }, (req, email, password, done) => {
     console.log('SIGNUP DATA: ', email, password);
+    console.log('SIGNUP REQ: ', req.body);
     // asynchronous
     // User.findOne wont fire unless data is sent back
     process.nextTick(() => {
@@ -44,6 +45,8 @@ const passportConfig = (passport) => {
         // set the user's local credentials
         newUser.local.email = email;
         newUser.local.password = newUser.generateHash(password);
+        // set the user's username
+        newUser.username = req.body.username;
         // save the user
         newUser.save((err) => { // eslint-disable-line no-shadow
           if (err) {

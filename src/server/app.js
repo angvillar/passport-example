@@ -14,11 +14,22 @@ import Users from './users/users';
 
 mongoose.connect(mongodbConfig.url);
 
-Users.remove({}, (err) => {
+Users.remove({}, (err) => { // eslint-disable-line consistent-return
   if (err) {
     return console.log('error while removing users collections: ', err);
   }
   return console.log('users collection removed');
+  /*
+  const newUser = new Users();
+  newUser.local.email = 'email@email.com';
+  newUser.local.password = newUser.generateHash('password');
+  newUser.save((err) => { // eslint-disable-line no-shadow
+    if (err) {
+      return console.log('error while save user: ', err);
+    }
+    return console.log('user saved');
+  });
+  */
 });
 
 passportConfig(passport);
@@ -135,7 +146,33 @@ app.get('/profile', isLoggedIn, (req, res) => {
 
 app.post('/settings/profile', (req, res) => {
   console.log(req.body);
-  res.json({ message: 'OK' });
+  Users.findOne({ _id: req.user.id }, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    const user = result;
+    console.log(user);
+    user.profile = req.body.profile;
+    user.save((err) => { // eslint-disable-line no-shadow
+      if (err) {
+        res.json({ message: 'an error occured while saving profile data' });
+      }
+      res.json({});
+    });
+  });
+});
+
+app.get('/:username', (req, res) => {
+  console.log('USERNAME: ', req.params.username);
+  const username = req.params.username;
+
+  Users.findOne({ username }, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    const user = result;
+    res.json({ user });
+  });
 });
 
 // logout

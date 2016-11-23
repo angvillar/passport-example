@@ -37,8 +37,10 @@ class Profile extends React.Component {
     event.preventDefault();
 
     const data = {
-      name: this.state.name.value,
-      bio: this.state.bio.value,
+      profile: {
+        name: this.state.name.value,
+        bio: this.state.bio.value,
+      },
     };
 
     // const formData = new FormData();
