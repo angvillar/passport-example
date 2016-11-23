@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router';
+import { withRouter, Link } from 'react-router';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import _ from 'lodash';
@@ -67,19 +67,41 @@ class SignUpForm extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
 
-    const formData = new FormData();
-    formData.append('email', JSON.stringify(this.state.email.value));
-    formData.append('password', JSON.stringify(this.state.password.value));
+    const details = {
+      email: this.state.email.value,
+      password: this.state.password.value,
+    };
+
+    let formBody = [];
+    for (const property in details) { // eslint-disable-line no-restricted-syntax, guard-for-in
+      const encodedKey = encodeURIComponent(property);
+      const encodedValue = encodeURIComponent(details[property]);
+      // formBody.push(encodedKey + "=" + encodedValue);
+      formBody.push(`${encodedKey}=${encodedValue}`);
+    }
+    formBody = formBody.join('&');
+    console.log(formBody);
 
     fetch('/signup', {
       method: 'post',
-      body: formData,
-      redirect: 'follow',
+      credentials: 'same-origin',
+      body: formBody,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
     })
     .then((res) => {
       console.log(res);
-      if (res.status === 200) {
-        this.props.router.push('/profile');
+      return res.json();
+    })
+    .then((json) => {
+      if (json.message.length) {
+        const newEmail = _.extend({}, this.state.email);
+        newEmail.error = json.message[0];
+        this.setState({ email: newEmail });
+      } else {
+        this.props.router.push('/settings');
       }
     })
     .catch(console.log);
@@ -87,43 +109,46 @@ class SignUpForm extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <TextField
-          type="text"
-          hintText="Username"
-          floatingLabelText="Username"
-          errorText={this.state.username.error}
-          value={this.state.username.value}
-          onChange={this.usernameHandleChange}
-          onBlur={this.usernameHandleBlur}
-        />
-        <br />
-        <TextField
-          type="text"
-          hintText="Email"
-          floatingLabelText="Email"
-          errorText={this.state.email.error}
-          value={this.state.email.value}
-          onChange={this.emailHandleChange}
-          onBlur={this.emailHandleBlur}
-        />
-        <br />
-        <TextField
-          type="password"
-          hintText="Password"
-          floatingLabelText="Password"
-          errorText={this.state.password.error}
-          value={this.state.password.value}
-          onChange={this.passwordHandleChange}
-          onBlur={this.passwordHandleBlur}
-        />
-        <br />
-        <RaisedButton
-          type="submit"
-          label="Submit"
-          primary
-        />
-      </form>
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <TextField
+            type="text"
+            hintText="Username"
+            floatingLabelText="Username"
+            errorText={this.state.username.error}
+            value={this.state.username.value}
+            onChange={this.usernameHandleChange}
+            onBlur={this.usernameHandleBlur}
+          />
+          <br />
+          <TextField
+            type="text"
+            hintText="Email"
+            floatingLabelText="Email"
+            errorText={this.state.email.error}
+            value={this.state.email.value}
+            onChange={this.emailHandleChange}
+            onBlur={this.emailHandleBlur}
+          />
+          <br />
+          <TextField
+            type="password"
+            hintText="Password"
+            floatingLabelText="Password"
+            errorText={this.state.password.error}
+            value={this.state.password.value}
+            onChange={this.passwordHandleChange}
+            onBlur={this.passwordHandleBlur}
+          />
+          <br />
+          <RaisedButton
+            type="submit"
+            label="Submit"
+            primary
+          />
+        </form>
+        <p>Already have an account, <Link to="/sign-in">Sign in</Link></p>
+      </div>
     );
   }
 

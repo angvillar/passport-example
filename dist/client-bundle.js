@@ -74,7 +74,11 @@
 	
 	var _SignInForm2 = _interopRequireDefault(_SignInForm);
 	
-	var _Profile = __webpack_require__(735);
+	var _Settings = __webpack_require__(735);
+	
+	var _Settings2 = _interopRequireDefault(_Settings);
+	
+	var _Profile = __webpack_require__(736);
 	
 	var _Profile2 = _interopRequireDefault(_Profile);
 	
@@ -82,9 +86,32 @@
 	
 	// Needed for onTouchTap
 	// http://stackoverflow.com/a/34015469/988941
-	
-	// import RaisedButton from 'material-ui/RaisedButton';
 	(0, _reactTapEventPlugin2.default)();
+	// import RaisedButton from 'material-ui/RaisedButton';
+	
+	
+	var isLoggedIn = function isLoggedIn(nextState, replace, callback) {
+	  console.log(nextState);
+	  fetch('/api/user_data', {
+	    method: 'get',
+	    credentials: 'same-origin',
+	    headers: {
+	      Accept: 'application/json'
+	    }
+	  }).then(function (res) {
+	    console.log(res);
+	    return res.json();
+	  }).then(function (json) {
+	    console.log(json);
+	    if (!json.userId) {
+	      replace('/sign-in');
+	    }
+	    callback();
+	  }).catch(function (err) {
+	    console.log(err);
+	    callback(err);
+	  });
+	};
 	
 	var App = function App() {
 	  return _react2.default.createElement(
@@ -96,7 +123,8 @@
 	      _react2.default.createElement(_reactRouter.Route, { path: '/', component: _SignUpForm2.default }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/sign-up', component: _SignUpForm2.default }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/sign-in', component: _SignInForm2.default }),
-	      _react2.default.createElement(_reactRouter.Route, { path: '/profile', component: _Profile2.default })
+	      _react2.default.createElement(_reactRouter.Route, { path: '/settings', component: _Settings2.default }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/settings/profile', component: _Profile2.default, onEnter: isLoggedIn })
 	    )
 	  );
 	};
@@ -42152,18 +42180,40 @@
 	
 	      event.preventDefault();
 	
-	      var formData = new FormData();
-	      formData.append('email', JSON.stringify(this.state.email.value));
-	      formData.append('password', JSON.stringify(this.state.password.value));
+	      var details = {
+	        email: this.state.email.value,
+	        password: this.state.password.value
+	      };
+	
+	      var formBody = [];
+	      for (var property in details) {
+	        // eslint-disable-line no-restricted-syntax, guard-for-in
+	        var encodedKey = encodeURIComponent(property);
+	        var encodedValue = encodeURIComponent(details[property]);
+	        // formBody.push(encodedKey + "=" + encodedValue);
+	        formBody.push(encodedKey + '=' + encodedValue);
+	      }
+	      formBody = formBody.join('&');
+	      console.log(formBody);
 	
 	      fetch('/signup', {
 	        method: 'post',
-	        body: formData,
-	        redirect: 'follow'
+	        credentials: 'same-origin',
+	        body: formBody,
+	        headers: {
+	          Accept: 'application/json',
+	          'Content-Type': 'application/x-www-form-urlencoded'
+	        }
 	      }).then(function (res) {
 	        console.log(res);
-	        if (res.status === 200) {
-	          _this2.props.router.push('/profile');
+	        return res.json();
+	      }).then(function (json) {
+	        if (json.message.length) {
+	          var newEmail = _lodash2.default.extend({}, _this2.state.email);
+	          newEmail.error = json.message[0];
+	          _this2.setState({ email: newEmail });
+	        } else {
+	          _this2.props.router.push('/settings');
 	        }
 	      }).catch(console.log);
 	    }
@@ -42171,43 +42221,57 @@
 	    key: 'render',
 	    value: function render() {
 	      return _react2.default.createElement(
-	        'form',
-	        { onSubmit: this.handleSubmit },
-	        _react2.default.createElement(_TextField2.default, {
-	          type: 'text',
-	          hintText: 'Username',
-	          floatingLabelText: 'Username',
-	          errorText: this.state.username.error,
-	          value: this.state.username.value,
-	          onChange: this.usernameHandleChange,
-	          onBlur: this.usernameHandleBlur
-	        }),
-	        _react2.default.createElement('br', null),
-	        _react2.default.createElement(_TextField2.default, {
-	          type: 'text',
-	          hintText: 'Email',
-	          floatingLabelText: 'Email',
-	          errorText: this.state.email.error,
-	          value: this.state.email.value,
-	          onChange: this.emailHandleChange,
-	          onBlur: this.emailHandleBlur
-	        }),
-	        _react2.default.createElement('br', null),
-	        _react2.default.createElement(_TextField2.default, {
-	          type: 'password',
-	          hintText: 'Password',
-	          floatingLabelText: 'Password',
-	          errorText: this.state.password.error,
-	          value: this.state.password.value,
-	          onChange: this.passwordHandleChange,
-	          onBlur: this.passwordHandleBlur
-	        }),
-	        _react2.default.createElement('br', null),
-	        _react2.default.createElement(_RaisedButton2.default, {
-	          type: 'submit',
-	          label: 'Submit',
-	          primary: true
-	        })
+	        'div',
+	        null,
+	        _react2.default.createElement(
+	          'form',
+	          { onSubmit: this.handleSubmit },
+	          _react2.default.createElement(_TextField2.default, {
+	            type: 'text',
+	            hintText: 'Username',
+	            floatingLabelText: 'Username',
+	            errorText: this.state.username.error,
+	            value: this.state.username.value,
+	            onChange: this.usernameHandleChange,
+	            onBlur: this.usernameHandleBlur
+	          }),
+	          _react2.default.createElement('br', null),
+	          _react2.default.createElement(_TextField2.default, {
+	            type: 'text',
+	            hintText: 'Email',
+	            floatingLabelText: 'Email',
+	            errorText: this.state.email.error,
+	            value: this.state.email.value,
+	            onChange: this.emailHandleChange,
+	            onBlur: this.emailHandleBlur
+	          }),
+	          _react2.default.createElement('br', null),
+	          _react2.default.createElement(_TextField2.default, {
+	            type: 'password',
+	            hintText: 'Password',
+	            floatingLabelText: 'Password',
+	            errorText: this.state.password.error,
+	            value: this.state.password.value,
+	            onChange: this.passwordHandleChange,
+	            onBlur: this.passwordHandleBlur
+	          }),
+	          _react2.default.createElement('br', null),
+	          _react2.default.createElement(_RaisedButton2.default, {
+	            type: 'submit',
+	            label: 'Submit',
+	            primary: true
+	          })
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Already have an account, ',
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/sign-in' },
+	            'Sign in'
+	          )
+	        )
 	      );
 	    }
 	  }]);
@@ -65436,6 +65500,16 @@
 	            label: 'Sign in',
 	            primary: true
 	          })
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          'Dont have an account, ',
+	          _react2.default.createElement(
+	            _reactRouter.Link,
+	            { to: '/sign-up' },
+	            'Register'
+	          )
 	        )
 	      );
 	    }
@@ -65468,13 +65542,161 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var Profile = function Profile() {
+	var Settings = function Settings() {
 	  return _react2.default.createElement(
 	    'h1',
 	    null,
-	    'Profile'
+	    'Settings'
 	  );
 	};
+	
+	exports.default = Settings;
+
+/***/ },
+/* 736 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _react = __webpack_require__(298);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _TextField = __webpack_require__(680);
+	
+	var _TextField2 = _interopRequireDefault(_TextField);
+	
+	var _RaisedButton = __webpack_require__(700);
+	
+	var _RaisedButton2 = _interopRequireDefault(_RaisedButton);
+	
+	var _lodash = __webpack_require__(727);
+	
+	var _lodash2 = _interopRequireDefault(_lodash);
+	
+	var _isLength = __webpack_require__(733);
+	
+	var _isLength2 = _interopRequireDefault(_isLength);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Profile = function (_React$Component) {
+	  _inherits(Profile, _React$Component);
+	
+	  function Profile(props) {
+	    _classCallCheck(this, Profile);
+	
+	    var _this = _possibleConstructorReturn(this, (Profile.__proto__ || Object.getPrototypeOf(Profile)).call(this, props));
+	
+	    _this.state = {
+	      name: { value: '', error: '' },
+	      bio: { value: '', error: '' }
+	    };
+	
+	    _this.nameHandleChange = _this.nameHandleChange.bind(_this);
+	    _this.bioHandleChange = _this.bioHandleChange.bind(_this);
+	    _this.submitHandle = _this.submitHandle.bind(_this);
+	    return _this;
+	  }
+	
+	  _createClass(Profile, [{
+	    key: 'nameHandleChange',
+	    value: function nameHandleChange(event) {
+	      var newName = _lodash2.default.extend({}, this.state.name);
+	      newName.value = event.target.value;
+	      newName.error = (0, _isLength2.default)(event.target.value, { min: 0, max: 20 }) ? '' : 'too long';
+	      this.setState({ name: newName });
+	    }
+	  }, {
+	    key: 'bioHandleChange',
+	    value: function bioHandleChange(event) {
+	      var newBio = _lodash2.default.extend({}, this.state.bio);
+	      newBio.value = event.target.value;
+	      newBio.error = (0, _isLength2.default)(event.target.value, { min: 0, max: 120 }) ? '' : 'too long';
+	      this.setState({ bio: newBio });
+	    }
+	  }, {
+	    key: 'submitHandle',
+	    value: function submitHandle(event) {
+	      event.preventDefault();
+	
+	      var data = {
+	        name: this.state.name.value,
+	        bio: this.state.bio.value
+	      };
+	
+	      // const formData = new FormData();
+	      // formData.append("data", JSON.stringify(data)); // eslint-disable-line quotes
+	
+	      fetch('/settings/profile', {
+	        method: 'post',
+	        credentials: 'same-origin',
+	        body: JSON.stringify(data),
+	        /*
+	        body: {
+	          name: JSON.stringify(this.state.name.value),
+	          bio: JSON.stringify(this.state.bio.value),
+	        },
+	        */
+	        headers: {
+	          Accept: 'application/json',
+	          'Content-Type': 'application/json'
+	        }
+	      }).then(function (res) {
+	        console.log(res);
+	        return res.json();
+	      }).then(function (json) {
+	        console.log(json);
+	      }).catch(console.log);
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'form',
+	        { onSubmit: this.submitHandle },
+	        _react2.default.createElement(_TextField2.default, {
+	          type: 'text',
+	          hintText: 'Name',
+	          floatingLabelText: 'Name',
+	          errorText: this.state.name.error,
+	          value: this.state.name.value,
+	          onChange: this.nameHandleChange
+	        }),
+	        _react2.default.createElement('br', null),
+	        _react2.default.createElement(_TextField2.default, {
+	          hintText: 'Tell about you',
+	          floatingLabelText: 'Bio',
+	          errorText: this.state.bio.error,
+	          value: this.state.bio.value,
+	          onChange: this.bioHandleChange,
+	          multiLine: true,
+	          rows: 4
+	        }),
+	        _react2.default.createElement('br', null),
+	        _react2.default.createElement(_RaisedButton2.default, {
+	          type: 'submit',
+	          label: 'Update profile',
+	          primary: true
+	        })
+	      );
+	    }
+	  }]);
+	
+	  return Profile;
+	}(_react2.default.Component);
 	
 	exports.default = Profile;
 

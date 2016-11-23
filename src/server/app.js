@@ -10,8 +10,17 @@ import path from 'path';
 import internalIp from 'internal-ip';
 import mongodbConfig from './mongodb-config';
 import passportConfig from './passport-config';
+import Users from './users/users';
 
 mongoose.connect(mongodbConfig.url);
+
+Users.remove({}, (err) => {
+  if (err) {
+    return console.log('error while removing users collections: ', err);
+  }
+  return console.log('users collection removed');
+});
+
 passportConfig(passport);
 
 const app = express();
@@ -57,6 +66,19 @@ app.get('/', (req, res) => {
   res.render('index.ejs');
 });
 */
+
+app.get('/api/user_data', (req, res) => {
+  if (req.user === undefined) {
+    res.json({
+      userId: undefined,
+    });
+  } else {
+    res.json({
+      userId: req.user.id,
+    });
+  }
+});
+
 app.get('/', (req, res) => {
   res.sendFile('index.html');
 });
@@ -87,12 +109,13 @@ app.post('/login', passport.authenticate('local-login', {
 // show the signup form
 app.get('/signup', (req, res) => {
   // render the page and pass in any flash data if it exists
-  res.render('signup.ejs', { message: req.flash('signupMessage') });
+  // res.render('signup.ejs', { message: req.flash('signupMessage') });
+  res.json({ message: req.flash('signupMessage') });
 });
 
 app.post('/signup', passport.authenticate('local-signup', {
   // redirect to the secure profile section
-  successRedirect: '/profile',
+  successRedirect: '/signup',
   // redirect back to the signup page if there is an error
   failureRedirect: '/signup',
   // allow flash messages
@@ -109,6 +132,12 @@ app.get('/profile', isLoggedIn, (req, res) => {
   });
 });
 */
+
+app.post('/settings/profile', (req, res) => {
+  console.log(req.body);
+  res.json({ message: 'OK' });
+});
+
 // logout
 /*
 app.get('/logout', (req, res) => {

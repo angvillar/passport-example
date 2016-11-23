@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router';
+import { withRouter, Link } from 'react-router';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 
@@ -96,6 +96,7 @@ class SignInForm extends React.Component {
             primary
           />
         </form>
+        <p>Dont have an account, <Link to="/sign-up">Register</Link></p>
       </div>
     );
   }
