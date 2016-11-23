@@ -24,6 +24,7 @@ const passportConfig = (passport) => {
     // allows us to pass back the entire request to the callback
     passReqToCallback: true,
   }, (req, email, password, done) => {
+    console.log('SIGNUP DATA: ', email, password);
     // asynchronous
     // User.findOne wont fire unless data is sent back
     process.nextTick(() => {
@@ -63,6 +64,7 @@ const passportConfig = (passport) => {
     // allows us to pass back the entire request to the callback
     passReqToCallback: true,
   }, (req, email, password, done) => {
+    console.log('SIGNIN DATA: ', email, password);
     // find a user whose email is the same as the forms email
     // we are checking to see if the user trying to login already exists
     Users.findOne({ 'local.email': email }, (err, user) => {
