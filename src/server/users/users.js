@@ -16,6 +16,11 @@ const usersSchema = mongoose.Schema({
     bio: String,
   },
 
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
+
 });
 
 // generating a hash
