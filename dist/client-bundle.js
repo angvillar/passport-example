@@ -127,7 +127,7 @@
 	      _react2.default.createElement(_reactRouter.Route, { path: '/', component: _SignUpForm2.default }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/sign-up', component: _SignUpForm2.default }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/sign-in', component: _SignInForm2.default }),
-	      _react2.default.createElement(_reactRouter.Route, { path: '/settings', component: _Settings2.default }),
+	      _react2.default.createElement(_reactRouter.Route, { path: '/settings', component: _Settings2.default, onEnter: isLoggedIn }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/settings/profile', component: _Profile2.default, onEnter: isLoggedIn }),
 	      _react2.default.createElement(_reactRouter.Route, { path: '/:username', component: _DashboardContainer2.default })
 	    )
@@ -65734,7 +65734,8 @@
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /* eslint-disable react/prop-types */
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	/* eslint-disable react/prop-types */
 	
 	var DashboardContainer = function (_React$Component) {
 	  _inherits(DashboardContainer, _React$Component);

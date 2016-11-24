@@ -1,5 +1,6 @@
 import passportLocal from 'passport-local';
 import Users from './users/users';
+import EmailVerificationToken from './emailVerificationToken/emailVerificationToken';
 
 const LocalStrategy = passportLocal.Strategy;
 
@@ -52,7 +53,16 @@ const passportConfig = (passport) => {
           if (err) {
             throw err;
           }
-          return done(null, newUser);
+          // create the user's email verification token
+          /* eslint-disable no-underscore-dangle */
+          const emailVerificationToken = new EmailVerificationToken({ userId: newUser._id });
+          emailVerificationToken.generateToken((error) => {
+            if (error) {
+              console.log('Can not create email verification token', error);
+              throw error;
+            }
+            return done(null, newUser);
+          });
         });
       });
     });

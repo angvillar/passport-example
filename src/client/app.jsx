@@ -47,7 +47,7 @@ const App = () => (
       <Route path="/" component={SignUpForm} />
       <Route path="/sign-up" component={SignUpForm} />
       <Route path="/sign-in" component={SignInForm} />
-      <Route path="/settings" component={Settings} />
+      <Route path="/settings" component={Settings} onEnter={isLoggedIn} />
       <Route path="/settings/profile" component={Profile} onEnter={isLoggedIn} />
       <Route path="/:username" component={DashboardContainer} />
     </Router>
