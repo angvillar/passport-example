@@ -8,29 +8,37 @@ import bodyParser from 'body-parser';
 import session from 'express-session';
 import path from 'path';
 import internalIp from 'internal-ip';
+import Promise from 'bluebird';
 import mongodbConfig from './mongodb-config';
 import passportConfig from './passport-config';
 import Users from './users/users';
 
+Promise.promisifyAll(mongoose);
+
 mongoose.connect(mongodbConfig.url);
 
+/*
 Users.remove({}, (err) => { // eslint-disable-line consistent-return
   if (err) {
     return console.log('error while removing users collections: ', err);
   }
   return console.log('users collection removed');
-  /*
-  const newUser = new Users();
-  newUser.local.email = 'email@email.com';
-  newUser.local.password = newUser.generateHash('password');
-  newUser.save((err) => { // eslint-disable-line no-shadow
-    if (err) {
-      return console.log('error while save user: ', err);
-    }
-    return console.log('user saved');
-  });
-  */
 });
+*/
+
+Users.removeAsync({})
+  .then(() => console.log('users collection removed'))
+  .then(() => {
+    const user = new Users({
+      username: 'jonsnow',
+      'local.email': 'email@email.com',
+      emailVerified: true,
+    });
+    user.local.password = user.generateHash('password');
+    return user;
+  })
+  .then(user => user.saveAsync())
+  .catch(err => console.log('error while removing users collections: ', err));
 
 passportConfig(passport);
 
@@ -162,6 +170,20 @@ app.post('/settings/profile', (req, res) => {
   });
 });
 
+// logout
+app.get('/logout', (req, res) => {
+  console.log('LOGGING OUT');
+  req.logout();
+  // res.redirect('/');
+  req.session.destroy((err) => {
+    if (err) {
+      console.log('error while destroying session: ', err);
+    }
+    console.log('session destroyed');
+    res.redirect('/');
+  });
+});
+
 app.get('/:username', (req, res) => {
   console.log('USERNAME: ', req.params.username);
   const username = req.params.username;
@@ -174,14 +196,6 @@ app.get('/:username', (req, res) => {
     res.json({ user });
   });
 });
-
-// logout
-/*
-app.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
-});
-*/
 
 const port = 3000;
 const ip = internalIp.v4();
