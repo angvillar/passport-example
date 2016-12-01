@@ -9,6 +9,9 @@ import session from 'express-session';
 import path from 'path';
 import internalIp from 'internal-ip';
 import Promise from 'bluebird';
+// import isEmail from 'validator/lib/isEmail';
+import isLength from 'validator/lib/isLength';
+// import R from 'ramda';
 import mongodbConfig from './mongodb-config';
 import passportConfig from './passport-config';
 import Users from './users/users';
@@ -25,7 +28,7 @@ Users.remove({}, (err) => { // eslint-disable-line consistent-return
   return console.log('users collection removed');
 });
 */
-
+/*
 Users.removeAsync({})
   .then(() => console.log('users collection removed'))
   .then(() => {
@@ -39,6 +42,7 @@ Users.removeAsync({})
   })
   .then(user => user.saveAsync())
   .catch(err => console.log('error while removing users collections: ', err));
+*/
 
 passportConfig(passport);
 
@@ -140,6 +144,40 @@ app.post('/signup', passport.authenticate('local-signup', {
   // allow flash messages
   failureFlash: true,
 }));
+
+/* eslint-disable */
+app.post('/api/sign-up', (req, res, next) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (!isLength(username, { min: 6, max: 20 })) {
+    return res.status(400).end();
+  }
+
+  Users.findOne({ username }, (err, user) => {
+    if (err) {
+      return res.status(500).end();
+    }
+    if (user) {
+      return res.status(409).end();
+    }
+    const userNew = new Users();
+    userNew.username = username;
+    userNew.password = userNew.generateHash(password);
+    userNew.save((err) => {
+      if (err) {
+        return res.status(500).end();
+      }
+      req.login(userNew, (err) => {
+        if (err) {
+          return res.status(500).end();
+        }
+        return res.status(201).end();
+      });
+    })
+  })
+
+});
 
 // we will want this protected so you have to be logged in to visit
 // we will use route middleware to verify this (the isLoggedIn function)

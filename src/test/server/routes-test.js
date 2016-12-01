@@ -7,7 +7,7 @@ import Users from '../../server/users/users';
 
 const agent = request.agent(app);
 
-describe('routes', () => {
+describe.skip('routes', () => {
   describe('/', () => {
     describe('user not logged in', () => {
       it('shows auth menu', (done) => {

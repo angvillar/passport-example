@@ -25,8 +25,8 @@ const passportConfig = (passport) => {
     // allows us to pass back the entire request to the callback
     passReqToCallback: true,
   }, (req, email, password, done) => {
-    console.log('SIGNUP DATA: ', email, password);
-    console.log('SIGNUP REQ: ', req.body);
+    // console.log('SIGNUP DATA: ', email, password);
+    // console.log('SIGNUP REQ: ', req.body);
     // asynchronous
     // User.findOne wont fire unless data is sent back
     process.nextTick(() => {
@@ -61,7 +61,7 @@ const passportConfig = (passport) => {
               console.log('Can not create email verification token', error);
               throw error;
             }
-            return done(null, newUser);
+            return done(null, newUser, req.flash('signupMessage', 'sign up success'));
           });
         });
       });
